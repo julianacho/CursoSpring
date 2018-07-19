@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
+	// Se genera el mensaje en propertis de manera no estatica
 	@Value("${application.controllers.mensaje}")
 	private String mensaje;
 	
-	@GetMapping("/")
+	@GetMapping("/") // Genera para que sea el rut del sitio
 	public String hola(Model model) {
 		model.addAttribute("mensaje", mensaje);
 		return "hola";
