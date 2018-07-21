@@ -1,18 +1,17 @@
 package com.example.demo.models.dao;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.models.entitys.Cliente;
 
 @Repository("ClienteDaoJPA") // Marca la clase como de persistencia de acceso a datos
-public abstract class ClienteDaoImpl implements IClienteDao {
+public class ClienteDaoImpl implements IClienteDao {
 	
 	@PersistenceContext // De forma automatica iyecta la configuracion que se establezca
 	private EntityManager em;
@@ -32,7 +31,6 @@ public abstract class ClienteDaoImpl implements IClienteDao {
 			em.merge(cliente);
 		} else {
 			em.persist(cliente);
-		    
 		}
 		
 	}

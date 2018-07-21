@@ -1,15 +1,11 @@
-package com.example.demo.models.dao;
-
-
+package com.example.demo.models.service;
 
 import java.util.List;
 
-
-
 import com.example.demo.models.entitys.Cliente;
 
-public interface IClienteDao { // Implementa Interface que hereda todos los metodos del crud
-	
+public interface IClienteService {
+
 	public List<Cliente> findAll();
 
 	public void save(Cliente cliente);
