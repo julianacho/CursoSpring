@@ -2,5 +2,8 @@
 http://localhost:8080/h2-console
 Se loguea con lo indicado en propertis
 
+2. El @Service permite que la clase sea un servicio y asu vez un @Component lo que permite que se pueda inyectar con @Autowired
+
+
 
 
