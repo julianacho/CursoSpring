@@ -150,7 +150,7 @@ public class ClienteController {
 		String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con éxito!" : "Cliente creado con éxito!";
 
 		clienteService.save(cliente);
-		status.setComplete();
+		status.setComplete(); // COmpleta el estatus de la sesion y elimina los datos de sesion en este caso el cliente ya que por la anotacion @SessionAttributes("cliente") mantiene la sesion arriba
 		flash.addFlashAttribute("success", mensajeFlash);
 		return "redirect:listar";
 	}
