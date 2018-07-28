@@ -27,23 +27,20 @@ import com.bolsadeideas.springboot.app.models.entity.ItemFactura;
 import com.bolsadeideas.springboot.app.models.entity.Producto;
 import com.bolsadeideas.springboot.app.models.service.IClienteService;
 
-
 @Controller
-@RequestMapping("/factura")// Se establece la ruta base del controlador
-@SessionAttributes("factura") // Para mantener la factura en la sesion
+@RequestMapping("/factura")
+@SessionAttributes("factura")
 public class FacturaController {
-	
-	@Autowired // Inyecta el cliente service debido a que es un componente
+
+	@Autowired
 	private IClienteService clienteService;
-	
+
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
-	@GetMapping("/ver/{id}") // Peteicion Get
-	//@PathVariable permite pasar el id de la vista
+
+	@GetMapping("/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
 
-		//Factura factura = clienteService.findFacturaById(id);
-		Factura factura = clienteService.fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(id);
+		Factura factura = clienteService.fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(id); // clienteService.findFacturaById(id);
 
 		if (factura == null) {
 			flash.addFlashAttribute("error", "La factura no existe en la base de datos!");
@@ -54,13 +51,8 @@ public class FacturaController {
 		model.addAttribute("titulo", "Factura: ".concat(factura.getDescripcion()));
 		return "factura/ver";
 	}
-	
-	@GetMapping(value = "/cargar-productos/{term}", produces = { "application/json" }) // produces genera una salida json
-	public @ResponseBody List<Producto> cargarProductos(@PathVariable String term) { // @ResponseBody permite retirnar la respuesta no sobre una vista si no sobre la respuesta del body de la respuesta
-		return clienteService.findByNombre(term);
-	}
-	
-	@GetMapping("/form/{clienteId}") // Establece la ruta de acceso en donde seria /factura/form/{clienteId}
+
+	@GetMapping("/form/{clienteId}")
 	public String crear(@PathVariable(value = "clienteId") Long clienteId, Map<String, Object> model,
 			RedirectAttributes flash) {
 
@@ -68,7 +60,7 @@ public class FacturaController {
 
 		if (cliente == null) {
 			flash.addFlashAttribute("error", "El cliente no existe en la base de datos");
-			return "redirect:/listar"; // Redirige a listar del controlador factura
+			return "redirect:/listar";
 		}
 
 		Factura factura = new Factura();
@@ -77,14 +69,17 @@ public class FacturaController {
 		model.put("factura", factura);
 		model.put("titulo", "Crear Factura");
 
-		return "factura/form"; // Retorna a la vista de factura/form
+		return "factura/form";
 	}
-	
-	@PostMapping("/form") // Tipo de peticion post por que guarda
-	                      // @Valid permite habilitar la validacion de la factura 
-	                      // Model Permite pasar datos a la vista	
+
+	@GetMapping(value = "/cargar-productos/{term}", produces = { "application/json" })
+	public @ResponseBody List<Producto> cargarProductos(@PathVariable String term) {
+		return clienteService.findByNombre(term);
+	}
+
+	@PostMapping("/form")
 	public String guardar(@Valid Factura factura, BindingResult result, Model model,
-			@RequestParam(name = "item_id[]", required = false) Long[] itemId, // Toma el valor del item id por arreglo por que son varios
+			@RequestParam(name = "item_id[]", required = false) Long[] itemId,
 			@RequestParam(name = "cantidad[]", required = false) Integer[] cantidad, RedirectAttributes flash,
 			SessionStatus status) {
 
@@ -111,17 +106,18 @@ public class FacturaController {
 		}
 
 		clienteService.saveFactura(factura);
-		status.setComplete(); // ELimina el objeto de sesion es decir la factura
+		status.setComplete();
 
 		flash.addFlashAttribute("success", "Factura creada con éxito!");
 
 		return "redirect:/ver/" + factura.getCliente().getId();
 	}
-	
-	@GetMapping("/eliminar/{id}") // Metodo tipo get para eliminar 
+
+	@GetMapping("/eliminar/{id}")
 	public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
 
 		Factura factura = clienteService.findFacturaById(id);
+
 		if (factura != null) {
 			clienteService.deleteFactura(id);
 			flash.addFlashAttribute("success", "Factura eliminada con éxito!");

@@ -23,7 +23,7 @@ public interface IClienteService {
 	
 	public void delete(Long id);
 	
-    public List<Producto> findByNombre(String term);
+	public List<Producto> findByNombre(String term);
 	
 	public void saveFactura(Factura factura);
 	
@@ -34,7 +34,5 @@ public interface IClienteService {
 	public void deleteFactura(Long id);
 	
 	public Factura fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(Long id);
-	
-	
 
 }

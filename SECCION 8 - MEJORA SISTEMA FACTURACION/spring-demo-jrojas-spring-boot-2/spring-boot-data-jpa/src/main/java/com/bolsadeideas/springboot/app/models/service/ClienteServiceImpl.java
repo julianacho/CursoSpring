@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bolsadeideas.springboot.app.models.dao.IClienteDao;
 import com.bolsadeideas.springboot.app.models.dao.IFacturaDao;
-import com.bolsadeideas.springboot.app.models.dao.IProductosDao;
+import com.bolsadeideas.springboot.app.models.dao.IProductoDao;
 import com.bolsadeideas.springboot.app.models.entity.Cliente;
 import com.bolsadeideas.springboot.app.models.entity.Factura;
 import com.bolsadeideas.springboot.app.models.entity.Producto;
@@ -22,7 +22,7 @@ public class ClienteServiceImpl implements IClienteService{
 	private IClienteDao clienteDao;
 	
 	@Autowired
-	private IProductosDao productoDao;
+	private IProductoDao productoDao;
 	
 	@Autowired
 	private IFacturaDao facturaDao;
@@ -38,35 +38,35 @@ public class ClienteServiceImpl implements IClienteService{
 	@Transactional
 	public void save(Cliente cliente) {
 		clienteDao.save(cliente);
-		
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Cliente findOne(Long id) {
-		// TODO Auto-generated method stub
-		return clienteDao.findOne(id);
+		return clienteDao.findById(id).orElse(null);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Cliente fetchByIdWithFacturas(Long id) {
+		return clienteDao.fetchByIdWithFacturas(id);
 	}
 
 	@Override
 	@Transactional
 	public void delete(Long id) {
-		clienteDao.delete(id);
-		
+		clienteDao.deleteById(id);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<Cliente> findAll(Pageable pageable) {
-		// TODO Auto-generated method stub
 		return clienteDao.findAll(pageable);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<Producto> findByNombre(String term) {
-		// TODO Auto-generated method stub
-		//return productoDao.findByNombre(term);
 		return productoDao.findByNombreLikeIgnoreCase("%"+term+"%");
 	}
 
@@ -74,44 +74,31 @@ public class ClienteServiceImpl implements IClienteService{
 	@Transactional
 	public void saveFactura(Factura factura) {
 		facturaDao.save(factura);
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public Producto findProductoById(Long id) {
-		// TODO Auto-generated method stub
-		return productoDao.findOne(id);
+		return productoDao.findById(id).orElse(null);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public Factura findFacturaById(Long id) {
-		// TODO Auto-generated method stub
-		return facturaDao.findOne(id);		
+		return facturaDao.findById(id).orElse(null);
 	}
 
 	@Override
 	@Transactional
 	public void deleteFactura(Long id) {
-		facturaDao.delete(id);
-		// TODO Auto-generated method stub
-		
+		facturaDao.deleteById(id); // facturaDao.deleteById(id);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public Factura fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(Long id) {
-		// TODO Auto-generated method stub
 		return facturaDao.fetchByIdWithClienteWhithItemFacturaWithProducto(id);
 	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Cliente fetchByIdWithFacturas(Long id) {
-		// TODO Auto-generated method stub
-		return clienteDao.fetchByIdWithFacturas(id);
-	}
-
+	
+	
 }
