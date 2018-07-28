@@ -41,6 +41,9 @@ public class Factura {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Cliente cliente;
 
+	// Como posee una relacion encascada esto permite que al guardar una factura tambienguarde los items de la factura
+	// con solo hacer el gradado de la factura
+	// Lo mismo ocurre cuando se borra la factura se borran sus lineas
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "factura_id")
 	private List<ItemFactura> items;
