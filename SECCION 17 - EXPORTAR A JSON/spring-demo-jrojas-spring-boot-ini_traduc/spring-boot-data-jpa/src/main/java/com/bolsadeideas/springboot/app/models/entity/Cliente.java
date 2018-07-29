@@ -22,6 +22,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 @Entity
 @Table(name = "clientes")
 public class Cliente implements Serializable {
@@ -46,9 +51,12 @@ public class Cliente implements Serializable {
 	@Column(name = "create_at")
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss") // Formatea la fecha cuando se serializa al json
 	private Date createAt;
 	
 	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	//@JsonIgnore // Permite que al generar el json, se ignore esta relacion
+	@JsonManagedReference // permite relacionr en una sola direccion
 	private List<Factura> facturas;
 	
 	public Cliente() {

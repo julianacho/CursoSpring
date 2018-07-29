@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "facturas_items")
 public class ItemFactura implements Serializable {
@@ -21,8 +23,10 @@ public class ItemFactura implements Serializable {
 
 	private Integer cantidad;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	//@ManyToOne(fetch=FetchType.EAGER)// No traes los objetos en carga perezosa si no los tre todos
+	@ManyToOne(fetch=FetchType.LAZY)// Craga perezosa: Trae el obeto cuando se necesite	
 	@JoinColumn(name="producto_id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Ignora atributos que se desean no esten en la serializacion
 	private Producto producto;
 
 	public Long getId() {
