@@ -1,5 +1,7 @@
 package com.bolsadeideas.springboot.app;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User.UserBuilder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,6 +27,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	// Se inyecta el componente
 	@Autowired
 	private LoginSuccessHandler successHandler;
+	
+	// Se inyecta el data source, la conexion a la bd
+	@Autowired 
+	private DataSource dataSource;
+
+	//Se inyecta el password encoder
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 	
 	/**
 	 * Permite la condiguracon de seguridad de las rutas de acceso
@@ -67,12 +78,19 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 		 * */
 		
 		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-		// Crea un usuaro por defecto
-		UserBuilder users = User.builder().passwordEncoder(encoder::encode);
-		// Creamos los posibles usuario con los que probaremos
-		build.inMemoryAuthentication()
-		.withUser(users.username("admin").password("admin").roles("ADMIN", "USER"))
-		.withUser(users.username("desjgr").password("desjgr").roles("USER"));
+		// Crea un usuaro por defecto en memoria
+//		UserBuilder users = User.builder().passwordEncoder(encoder::encode);
+//		// Creamos los posibles usuario con los que probaremos
+//		build.inMemoryAuthentication()
+//		.withUser(users.username("admin").password("admin").roles("ADMIN", "USER"))
+//		.withUser(users.username("desjgr").password("desjgr").roles("USER"));
+		
+		// Configura la forma de hacer la autenticacion, es decir la consulta para autenticacion  y revision de roles
+		build.jdbcAuthentication()
+		.dataSource(dataSource)
+		.passwordEncoder(passwordEncoder)
+		.usersByUsernameQuery("select username, password, enabled from users where username=?")
+		.authoritiesByUsernameQuery("select u.username, a.authority from authorities a inner join users u on (a.user_id=u.id) where u.username=?");
 	}
 
 }
