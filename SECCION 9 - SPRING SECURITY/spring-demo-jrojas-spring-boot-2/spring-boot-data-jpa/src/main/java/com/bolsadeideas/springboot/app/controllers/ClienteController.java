@@ -2,18 +2,31 @@ package com.bolsadeideas.springboot.app.controllers;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,6 +48,8 @@ import com.bolsadeideas.springboot.app.util.paginator.PageRender;
 @Controller
 @SessionAttributes("cliente")
 public class ClienteController {
+	
+	protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@Autowired
 	private IClienteService clienteService;
@@ -42,7 +57,9 @@ public class ClienteController {
 	@Autowired
 	private IUploadFileService uploadFileService;
 
+	// @Secured({"ROLE_USER"}) permite garantizar que solo el role ROLE_USER puede acceder a este controlador
 	@GetMapping(value = "/uploads/{filename:.+}")
+	@Secured({"ROLE_USER","ROLE_ADMIN"})
 	public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
 
 		Resource recurso = null;
@@ -59,6 +76,7 @@ public class ClienteController {
 				.body(recurso);
 	}
 
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 
@@ -72,9 +90,47 @@ public class ClienteController {
 		model.put("titulo", "Detalle cliente: " + cliente.getNombre());
 		return "ver";
 	}
+	
+	// value = {"/listar","/"} HACE QUE LA PAGINA DE INICIO SEA listar debido a que al cargar el directorio
+	// se envia la peticion a este metodo
+	// Authentication authentication Objeto que trae la autenticacion
+	// HttpServletRequest request	
+	@RequestMapping(value = {"/listar","/"}, method = RequestMethod.GET)
+	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, 
+			Model model, Authentication authentication, HttpServletRequest request) {
+		// Forma dinamica de obtener el usuario, or inyeccion de dependencias
+		if(authentication != null) {
+			logger.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
+		}
 
-	@RequestMapping(value = "/listar", method = RequestMethod.GET)
-	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+		// Forma estatica de obtener el usuario
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+		if(auth != null) {
+			logger.info("Utilizando forma estática SecurityContextHolder.getContext().getAuthentication(): Usuario autenticado: ".concat(auth.getName()));
+		}
+		// Determina el acceso por rol
+		if(hasRole("ROLE_ADMIN")) {
+			logger.info("Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+		} else {
+			logger.info("Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+		}
+		
+		//Optiene el role a partir del request
+		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "");
+		// USUARIO ES EL ROL ESPECIFICO
+		if(securityContext.isUserInRole("ROLE_ADMIN")) {
+			logger.info("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+		} else {
+			logger.info("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+		}
+
+		// OTRA FORMA ES SOLO VALIDAR CON EL OBJETO REQUEST DE FORMA NATIVA
+		if(request.isUserInRole("ROLE_ADMIN")) {
+			logger.info("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+		} else {
+			logger.info("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+		}	
 
 		Pageable pageRequest = PageRequest.of(page, 4);
 
@@ -87,6 +143,7 @@ public class ClienteController {
 		return "listar";
 	}
 
+	@Secured({"ROLE_ADMIN"})
 	@RequestMapping(value = "/form")
 	public String crear(Map<String, Object> model) {
 
@@ -96,6 +153,7 @@ public class ClienteController {
 		return "form";
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/form/{id}")
 	public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 
@@ -116,6 +174,7 @@ public class ClienteController {
 		return "form";
 	}
 
+	@Secured({"ROLE_ADMIN"})
 	@RequestMapping(value = "/form", method = RequestMethod.POST)
 	public String guardar(@Valid Cliente cliente, BindingResult result, Model model,
 			@RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
@@ -155,6 +214,7 @@ public class ClienteController {
 		return "redirect:listar";
 	}
 
+	@Secured({"ROLE_ADMIN"})
 	@RequestMapping(value = "/eliminar/{id}")
 	public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
 
@@ -170,5 +230,39 @@ public class ClienteController {
 
 		}
 		return "redirect:/listar";
+	}
+	
+	/**
+	 * Cumple con el rol
+	 * @param role
+	 * @return
+	 */
+	private boolean hasRole(String role) {
+
+		// Optiee los roles
+		SecurityContext context = SecurityContextHolder.getContext();
+		if (context == null) {
+			return false;
+		}
+		// Optiene la autenticacion
+		Authentication auth = context.getAuthentication();
+		if (auth == null) {
+			return false;
+		}
+		// Cualquier objeto que implementa la interfaz GrantedAuthority
+		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+		// Determina si contiene el rol autorizado
+		return authorities.contains(new SimpleGrantedAuthority(role));
+
+		// Itera para determinar los roles de usuario
+//		 for(GrantedAuthority authority: authorities) {
+//		 if(role.equals(authority.getAuthority())) {
+//		 logger.info("Hola usuario ".concat(auth.getName()).concat(" tu role es: "
+//		 .concat(authority.getAuthority()))); return true; } }
+		 
+//		 return false;
+		
+
 	}
 }
