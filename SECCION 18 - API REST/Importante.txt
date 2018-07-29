@@ -1,0 +1,5 @@
+Llamado a primer servicio
+- http://localhost:8090/listar-rest  // Formato Json
+- http://localhost:8090/listar-rest-xml // Formato xml
+- http://localhost:8090/api/clientes/listar-xml // rest xml
+- http://localhost:8090/api/clientes/listar // rest json
