@@ -50,7 +50,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //		Se comentaria por que la autorizacion se puede hacer por anotaciones sobre los metodos
 
 		http.authorizeRequests()
-		.antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar").permitAll()   // Permite a todos acceder a esas rutas
+		.antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar", "/locale").permitAll()   // Permite a todos acceder a esas rutas
 		//.antMatchers("/ver/**").hasAnyRole("USER") // SOlo los usuarios con rol USER puede acceder a la ruta ver
 		//.antMatchers("/uploads/**").hasAnyRole("USER")
 		//.antMatchers("/form/**").hasAnyRole("ADMIN")  // Solo el admino puede aaceder a estas rutas
