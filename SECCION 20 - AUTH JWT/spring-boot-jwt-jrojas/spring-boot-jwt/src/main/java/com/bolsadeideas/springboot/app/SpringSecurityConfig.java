@@ -1,6 +1,7 @@
 package com.bolsadeideas.springboot.app;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -9,7 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.bolsadeideas.springboot.app.auth.filter.JWTAuthenticationFilter;
+import com.bolsadeideas.springboot.app.auth.filter.JWTAuthorizationFilter;
 import com.bolsadeideas.springboot.app.auth.handler.LoginSuccessHandler;
+import com.bolsadeideas.springboot.app.auth.service.JWTService;
 import com.bolsadeideas.springboot.app.models.service.JpaUserDetailsService;
 
 @EnableGlobalMethodSecurity(securedEnabled=true, prePostEnabled=true)
@@ -25,17 +29,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private JWTService jwtService;
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeRequests().antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar**", "/locale", "/api/clientes/**").permitAll()
-		/*.antMatchers("/ver/**").hasAnyRole("USER")*/
-		/*.antMatchers("/uploads/**").hasAnyRole("USER")*/
-		/*.antMatchers("/form/**").hasAnyRole("ADMIN")*/
-		/*.antMatchers("/eliminar/**").hasAnyRole("ADMIN")*/
-		/*.antMatchers("/factura/**").hasAnyRole("ADMIN")*/
+		http.authorizeRequests().antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar**", "/locale").permitAll()
 		.anyRequest().authenticated()
-		.and()
+		
+		/*
+		 * .and()
 		    .formLogin()
 		        .successHandler(successHandler)
 		        .loginPage("/login")
@@ -43,7 +47,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter{
 		.and()
 		.logout().permitAll()
 		.and()
-		.exceptionHandling().accessDeniedPage("/error_403");
+		.exceptionHandling().accessDeniedPage("/error_403")
+		*
+		*/
+		
+		.and()
+		.addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtService))//  Adiciona el filtro de loguin
+		.addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtService))// Adiciona el filtro de autorizacion
+		.csrf().disable()
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 	}
 

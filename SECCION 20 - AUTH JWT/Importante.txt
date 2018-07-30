@@ -1,0 +1,10 @@
+JWT: JSON WEB TOKEN
+- pagina para validar el token
+https://jwt.io/
+- Se ingresa la clave secreta del token para validarlo
+
+-- Servicio de consulta
+http://localhost:8090/api/clientes/listar
+
+-- Servicio de login
+http://localhost:8090/api/login
