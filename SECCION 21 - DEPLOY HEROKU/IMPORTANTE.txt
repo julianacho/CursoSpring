@@ -1,0 +1,29 @@
+/**********************
+DESPLEGAR EN HEROKU
+/**************************
+0. TOCA LLEVAR EL PROYECTO A UNA RUTA QUE NO TENGA GIT O SERIA TRABAJARLO EN ESA RUTA PARA LOS CAMBIOS
+1. VAMOS A LA RAIZ EN DONDE ESTA EL PROYECTO POR CMD CD C:\CURSO SPRING UDEMY\Git\SECCION 21 - DEPLOY HEROKU\spring-boot-heroku-jrojas\spring-boot-heruku
+2. ingresamos heroku login e ingresamos los datos de contrasenia
+3. creear el repo git con el comando: git init
+4. se ejcuta el comando: heroku git:remote -a spring-boot-jgr donde "spring-boot-jgr" es el nombre del proyecto en heroku
+5. se indica quienes somos con el siguiente comando: git config --global user.email "julianrojasing@gmail.com"
+6. Se hace el git a con el comando: git add .
+7. Se hace el commit: git commit -am "Primer Deploy"
+8. Se sube el commit: git push heroku master // Descarga las librerias y compila el proyecto generando el jar con el tomcat embebido
+9. Subimos el despliegue con el comando: heroku open
+10. Mirar el log del despliegue con el comando: heroku logs --tail
+
+/*****************
+DESPLEGAR SOLO EL JAR
+********************/
+PROYECTO: spring-boot2-jgr-vr2
+1. EN APLICACION.PROPERTIS AGREGAR server.port=${PORT:8080}
+2. GENERAMOS EL JAR CON MAVEN-INSTALL
+3. VAMOS A LA RAIZ EN DONDE ESTA EL PROYECTO POR CMD CD C:\CURSO SPRING UDEMY\Git\SECCION 21 - DEPLOY HEROKU\spring-boot-heroku-jrojas\spring-boot-heruku
+4. ingresamos heroku login e ingresamos los datos de contrasenia
+5. ejecuta comando: git init
+6. ejecuta comando: heroku plugins:install heroku-cli-deploy
+7. Indicar a que proyecto va el comando: heroku git:remote -a spring-boot2-jgr-vr2
+8. Desplegar con el comando: heroku deploy:jar "ruta_del_jar.jar" -> heroku deploy:jar .\target\spring-boot-heruku-0.0.1-SNAPSHOT.jar 
+9. Subimos el despliegue con el comando: heroku open
+10. Mirar el log del despliegue con el comando: heroku logs --tail -- para dejar permanente

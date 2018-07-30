@@ -1,0 +1,59 @@
+/****************************
+DESPLIEGE JAR O WAR CON TOMCAT EMBEBIDO
+*******************************/
+1. Generar JAR y despliegue tomcat enbebido
+a. Clic derecho -> run as -> maven install
+b. ejecutar en consola en la carpeta target del proyecto
+   java -jar nombre_jar.jar
+   java -jar nombre_jar.war
+
+/******************
+convertir a jar
+********************/
+1. rEALIZAR COPIA DEL PROYECTO
+2. Modificar groupId , artifactId  y name del porm.xml para que sea tomcat
+3. cambiar packaging a war en porm.xml
+4. AGregar dependencia
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+5. Se eleimina la dependencia spring-boot-devtools
+6. Actuaalizar el maven del proyecto
+7. Clic derecho -> run as -> maven clean // Limpia el proyecto
+8. Crear la clase ServletInitializer
+9. Clic derecho -> run as -> maven install
+
+/***************************
+levantar tomcat
+**************************/
+1. vamos a la carpeta bien del tomcat y se ejecuta startup.bat
+2. se copia el war en la carpeta webapps del tomcat
+http://localhost:8080/  url del tomcat
+3. Para ingresar se adciona a la url el nombre del war
+http://localhost:8080/spring-boot-tomcat-0.0.1-SNAPSHOT/
+
+/***************************
+levantar widfly
+**************************/
+1. Clic derecho -> run as -> maven clean // Limpia el proyecto
+2. Modificar groupId , artifactId  y name del porm.xml para que sea tomcat
+3. Actuaalizar el maven del proyecto
+4. Se cera el war Clic derecho -> run as -> maven install
+5. Se copia el war en la siguiente ruta C:\CURSO SPRING UDEMY\wildfly-13.0.0.Final\standalone\deployments
+6. Por cmd vamos a la siguiente ruta C:\CURSO SPRING UDEMY\wildfly-13.0.0.Final\bin
+7. Se inicia con el comando stanalone.bat
+
+/********************
+LEVANTAR GALSFISH
+*********************/
+1. Por cmd vamos a la siguiente ruta C:\CURSO SPRING UDEMY\glassfish5\bin
+2. se ejecuta el comando asadmin.bat start-domain
+3. detener el servidor asadmin.bat stop-domain
+
+
+
+
+
+
