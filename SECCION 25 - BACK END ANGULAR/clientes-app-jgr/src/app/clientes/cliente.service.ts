@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class ClienteService {
 
-  private urlEndPoint: string = 'http://localhost:8080/api/clientes';
+  private urlEndPoint: string = 'http://localhost:8090/api/clientes';
   constructor(private http: HttpClient) { }
 
   //Observable hace que la respuesta se de como un observable
