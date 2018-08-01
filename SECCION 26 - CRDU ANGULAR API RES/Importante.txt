@@ -1,0 +1,26 @@
+-- INstalacion de api de mensjes
+npm install sweetalert2 --save
+
+
+CONSULTA TODO
+GET http://localhost:8080/api/clientes  
+CONSULTA SOLO ID
+GET http://localhost:8080/api/clientes/1
+CREAR
+POST http://localhost:8080/api/clientes
+BODY RAW JSON: {
+    "nombre": "Julian",
+    "apellido": "Rojas",
+    "email": "profesor@bolsadeideas.com"
+	
+}
+MODIFICAR
+http://localhost:8080/api/clientes/2
+BODY RAW JSON: {
+    "nombre": "Julian",
+    "apellido": "Rojas",
+    "email": "profesor@bolsadeideas.com"
+	
+}
+ELIMINAR
+DELETE http://localhost:8080/api/clientes/1

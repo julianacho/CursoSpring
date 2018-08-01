@@ -1,4 +1,4 @@
-package com.jgr.springboot.backend.apirest.controller;
+package com.bolsadeideas.springboot.backend.apirest.controllers;
 
 import java.util.Date;
 import java.util.List;
@@ -16,18 +16,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jgr.springboot.backend.apirest.models.entity.Cliente;
-import com.jgr.springboot.backend.apirest.models.services.IClienteService;
+import com.bolsadeideas.springboot.backend.apirest.models.entity.Cliente;
+import com.bolsadeideas.springboot.backend.apirest.models.services.IClienteService;
 
-@CrossOrigin(origins = { "http://localhost:4200" }) // Indica que solo puede acceder desde esta url
-@RestController // IMPLEMENTA COMO UN API RES
-@RequestMapping("/api") // URL DEL END
+@CrossOrigin(origins = { "http://localhost:4200" })
+@RestController
+@RequestMapping("/api")
 public class ClienteRestController {
-	
+
 	@Autowired
 	private IClienteService clienteService;
 
-	@GetMapping("/clientes") // Mapeo de la url de tipo Get
+	@GetMapping("/clientes")
 	public List<Cliente> index() {
 		return clienteService.findAll();
 	}
@@ -62,5 +62,4 @@ public class ClienteRestController {
 		Cliente currentCliente = this.clienteService.findById(id);
 		this.clienteService.delete(currentCliente);
 	}
-
 }

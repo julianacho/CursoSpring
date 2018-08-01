@@ -27,26 +27,32 @@ public class ClienteRestController {
 	@Autowired
 	private IClienteService clienteService;
 
+	// Tipo get
 	@GetMapping("/clientes") // Mapeo de la url de tipo Get
+	@ResponseStatus(HttpStatus.OK)// Responde el estado de correcto
 	public List<Cliente> index() {
 		return clienteService.findAll();
 	}
 
-	@GetMapping("/clientes/{id}")
+	@GetMapping("/clientes/{id}")// Se envi el id por parametro @PathVariable
+	@ResponseStatus(HttpStatus.OK)// Responde el estado de correcto aunque este se asigna por defecto
 	public Cliente show(@PathVariable Long id) {
 		return this.clienteService.findById(id);
 	}
 
-	@PostMapping("/clientes")
-	@ResponseStatus(HttpStatus.CREATED)
+	// Tipo post recibe el objeto cliente por parametro
+	@PostMapping("/clientes")// los datos bienen dentro de los datos de la peticion
+	@ResponseStatus(HttpStatus.CREATED) // Responde el estatus de creado
 	public Cliente create(@RequestBody Cliente cliente) {
 		cliente.setCreateAt(new Date());
 		this.clienteService.save(cliente);
 		return cliente;
 	}
 
+	// Tipo Put la peticion, recibe el cliente que esta dentro del cuerpo del request
+	// El id que se envia como variable
 	@PutMapping("/clientes/{id}")
-	@ResponseStatus(HttpStatus.CREATED)
+	@ResponseStatus(HttpStatus.CREATED)	
 	public Cliente update(@RequestBody Cliente cliente, @PathVariable Long id) {
 		Cliente currentCliente = this.clienteService.findById(id);
 		currentCliente.setNombre(cliente.getNombre());
@@ -56,6 +62,7 @@ public class ClienteRestController {
 		return currentCliente;
 	}
 
+	// Tipo delete
 	@DeleteMapping("/clientes/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
